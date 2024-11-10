@@ -2,16 +2,48 @@
 
 
 {% block title %}
-    <title>Tasks</title>
+    <title>NovaTask • Tasks</title>
 {% endblock title %}
 
 {% block content %}
+    <form method = "GET">
+        {{ filter_form.as_p }}
+        <button class = "btn btn-primary mb-5" type = "submit">Filter</button>
+    </form>
+
+
     <h1>Tasks</h1>
     <ul>
         {% for task in tasks %}
-            <p><a href = {% url "task-detail" task.pk %}>{{task.name}}</a></p>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Name: {{task.name}}</h3>
+
+                        {% if task.status == "_in_progress" %}
+                            <h5>Status: <span class="badge text-bg-primary">In Progress</span></h5>
+                        {% elif task.status == "_done" %}
+                            <h5>Status: <span class="badge text-bg-success">Done</span></h5>
+                        {% elif task.status == "_expired" %}
+                            <h5>Status: <span class="badge text-bg-danger">Expired</span></h5>
+                        {% endif %}
+
+                        {% if task.priority == "_low" %}
+                            <h5>Priority: <span class="badge text-bg-success">Low</span></h5>
+                        {% elif task.priority == "_mid" %}
+                            <h5>Priority: <span class="badge text-bg-warning">Middle</span></h5>
+                        {% elif task.priority == "_high" %}
+                            <h5>Priority: <span class="badge text-bg-danger">High</span></h5>
+                        {% endif %}
+
+                        <a class = "btn btn-outline-primary" href = {% url "task-detail" task.pk %}>Details</a>
+                        <a class = "btn btn-outline-success" href = {% url "task-update" task.pk %}>Update</a>
+                        <a class = "btn btn-outline-danger" href = {% url "task-delete" task.pk %}>Delete</a>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
     </ul>
 
-    <a href = "/tasks/create/">Create New Task</a>
+    <a class = "btn btn-primary" href = "/tasks/create/">Create New Task</a>
 {% endblock content %}

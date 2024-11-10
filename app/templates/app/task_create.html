@@ -2,15 +2,20 @@
 
 
 {% block title %}
-    <title>Create Task</title>
+    <title>NovaTask • Create Task</title>
 {% endblock title %}
 
 
 {% block content %}
-    <h1>Create Task:</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type = "submit">Create</button>
-    </form>
+<div class="container col-xl-10 col-xxl-8 px-4 py-5">
+        <form method="POST" class="p-5 p-md-5 border rounded-3 bg-body-tertiary">
+            <p>Owner:</p>
+            <input class = "form-control mb-3\" placeholder = "{{user.first_name}}" disabled></input>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock content %}

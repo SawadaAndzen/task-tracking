@@ -1,0 +1,15 @@
+{% extends "app/base.html" %}
+
+
+{% block title %}
+    <title>NovaTask • Delete Task</title>
+{% endblock title %}
+
+
+{% block content %}
+    <form method = "POST">
+        {% csrf_token %}
+        <button type = "submit">Confirm</button>
+        <a href = "/">Back</a>
+    </form>
+{% endblock content %}
