@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Task(models.Model):
@@ -11,3 +12,4 @@ class Task(models.Model):
         ("_low", "Low"), ("_mid", "Middle"), ("_high", "High")
     ])
     deadline = models.DateTimeField()
+    user = models.ForeignKey(User, on_delete = models.CASCADE)

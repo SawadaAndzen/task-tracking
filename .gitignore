@@ -1,1 +1,5 @@
 /.env
+project/__pycache__
+project/migrations/__pycache__
+app/__pycache__
+login_access.asc
