@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Task
+from .models import Task, Comment
 
 
 class TaskForm(forms.ModelForm):
@@ -60,4 +60,20 @@ class TaskFilterForm(forms.Form):
     status = forms.ChoiceField(choices = status_choices, required = False, label = "Status",  widget = forms.Select(attrs={'class': 'form-control'}))
     priority = forms.ChoiceField(choices = priority_choices, required = False, label = "Priority", widget = forms.Select(attrs={'class': 'form-control'}))
     
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content"]
+        labels = {'content': ''}
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 1,
+                'cols': 50,
+                'placeholder': 'Write your comment here...',
+            }),
+        }
     
+    def __init__(self, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
