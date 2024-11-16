@@ -1,0 +1,16 @@
+{% extends "app/base.html" %}
+
+
+{% block title %}
+    <title>NovaTask • Update Comment</title>
+{% endblock title %}
+
+
+{% block content %}
+    <h1>Update Task:</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type = "submit">Update</button>
+    </form>
+{% endblock content %}
