@@ -6,44 +6,55 @@
 {% endblock title %}
 
 {% block content %}
-    <form method = "GET">
+<div class="d-flex justify-content-between align-items-start mt-3 ms-2">
+    <form method="GET" class="filter-form">
         {{ filter_form.as_p }}
-        <button class = "btn btn-primary mb-5" type = "submit">Filter</button>
+        <button class="btn btn-primary mb-3" type="submit"> <i class="bi bi-arrow-repeat"></i> Filter</button>
+        <a class="btn btn-primary" href="/tasks/create/"> <i class="bi bi-plus-circle"></i> New Task</a>
     </form>
 
+    <div class="ms-3 me-3 mt-3 list-container container-sm border rounded-3">
+        <h1 class="text-center mb-4">Tasks</h1>
+        <div class="row">
+            {% for task in tasks %}
+                <div class="col-md-auto col-lg-auto ms-auto me-auto">
+                    <div class="card mb-4 overflow-auto" style="max-height: 400px;">
+                        <div class="card-body">
+                            <h3>Name: {{ task.name }}</h3>
 
-    <h1>Tasks</h1>
-    <ul>
-        {% for task in tasks %}
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h3>Name: {{task.name}}</h3>
+                            {% if task.status == "_in_progress" %}
+                                <h5>Status: <span class="badge text-bg-primary">In Progress</span></h5>
+                            {% elif task.status == "_done" %}
+                                <h5>Status: <span class="badge text-bg-success">Done</span></h5>
+                            {% elif task.status == "_expired" %}
+                                <h5>Status: <span class="badge text-bg-danger">Expired</span></h5>
+                            {% endif %}
 
-                        {% if task.status == "_in_progress" %}
-                            <h5>Status: <span class="badge text-bg-primary">In Progress</span></h5>
-                        {% elif task.status == "_done" %}
-                            <h5>Status: <span class="badge text-bg-success">Done</span></h5>
-                        {% elif task.status == "_expired" %}
-                            <h5>Status: <span class="badge text-bg-danger">Expired</span></h5>
-                        {% endif %}
+                            {% if task.priority == "_low" %}
+                                <h5>Priority: <span class="badge text-bg-success">Low</span></h5>
+                            {% elif task.priority == "_mid" %}
+                                <h5>Priority: <span class="badge text-bg-warning">Middle</span></h5>
+                            {% elif task.priority == "_high" %}
+                                <h5>Priority: <span class="badge text-bg-danger">High</span></h5>
+                            {% endif %}
 
-                        {% if task.priority == "_low" %}
-                            <h5>Priority: <span class="badge text-bg-success">Low</span></h5>
-                        {% elif task.priority == "_mid" %}
-                            <h5>Priority: <span class="badge text-bg-warning">Middle</span></h5>
-                        {% elif task.priority == "_high" %}
-                            <h5>Priority: <span class="badge text-bg-danger">High</span></h5>
-                        {% endif %}
+                            <a class="me-5 btn btn-outline-primary" href="{% url 'task-detail' task.pk %}">
+                                <i class="bi bi-list"></i> Details
+                            </a>
 
-                        <a class = "btn btn-outline-primary" href = {% url "task-detail" task.pk %}>Details</a>
-                        <a class = "btn btn-outline-success" href = {% url "task-update" task.pk %}>Update</a>
-                        <a class = "btn btn-outline-danger" href = {% url "task-delete" task.pk %}>Delete</a>
+                            {% if  task.user == current_user or user.is_superuser %}
+                                <a class="me-1 btn btn-outline-success" href="{% url 'task-update' task.pk %}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a class="btn btn-outline-danger" href="{% url 'task-delete' task.pk %}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </ul>
-
-    <a class = "btn btn-primary" href = "/tasks/create/">Create New Task</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock content %}

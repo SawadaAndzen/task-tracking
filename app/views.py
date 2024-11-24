@@ -5,8 +5,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Task, Comment, Like
-from .forms import TaskForm, CustomSignUpForm, TaskFilterForm, CommentForm
+from .models import Task, Comment, Like, Profile
+from .forms import TaskForm, CustomSignUpForm, TaskFilterForm, CommentForm, ProfileForm
 from .mixin import UserIsOwnerMixin, UserIsCommentOwnerMixin
 
 
@@ -30,6 +30,7 @@ class TaskList(ListView):
     def get_context_data(self, **kwargs):
         context =  super().get_context_data(**kwargs)
         context["filter_form"] = TaskFilterForm(self.request.GET)
+        context["current_user"] = self.request.user
         
         return context
     
@@ -48,7 +49,7 @@ class TaskDetail(DetailView):
         return context
     
     def post(self, request, *args, **kwargs):
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
         
         if form.is_valid():
             comment = form.save(commit = False)
@@ -64,16 +65,18 @@ class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
     success_url = '/tasks/'
+    login_url = "/login/"
     template_name = 'app/task_create.html'
     
     def form_valid(self, form):
         form.instance.user = self.request.user
+        form.instance.status = "_in_progress"
         return super().form_valid(form)
     
     
 class TaskDelete(UserIsOwnerMixin, LoginRequiredMixin, DeleteView):
     model = Task
-    success_url = "/"
+    success_url = "/tasks/"
     login_url = "/login/"
     template_name = "app/confirm_delete.html"
     
@@ -82,7 +85,7 @@ class TaskUpdate(UserIsOwnerMixin, LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     login_url = "/login/"
-    success_url = "/"
+    success_url = "/tasks/"
     template_name = "app/task_update.html"
     
     
@@ -128,3 +131,34 @@ class SignUp(CreateView):
     form_class = CustomSignUpForm
     success_url = "/login/"
     template_name = "app/auth/signup.html"
+    
+    
+class ProfileDetail(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = 'app/profile.html'
+    context_object_name = 'user'
+    login_url = "/login/"
+
+    def get_object(self):
+        user = self.request.user
+        Profile.objects.get_or_create(user=user)
+        return user
+    
+    
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = ProfileForm
+    template_name = 'app/update_profile.html'
+    success_url = reverse_lazy('profile')
+    login_url = "/login/"
+
+    def get_object(self, queryset = None):
+        user = self.request.user
+
+        Profile.objects.get_or_create(user = user)
+
+        return user
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)

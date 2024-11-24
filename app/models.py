@@ -13,12 +13,18 @@ class Task(models.Model):
     ])
     deadline = models.DateTimeField()
     user = models.ForeignKey(User, on_delete = models.CASCADE)
+    image = models.ImageField(upload_to = "tasks-media/", blank = True, null = True)
+    media = models.FileField(upload_to = "tasks-media/", blank = True, null = True)
+    
+    def __str__(self):
+        return f"{self.name} by {self.user.username}"
     
     
 class Comment(models.Model):
     task = models.ForeignKey(Task, on_delete = models.CASCADE)
     author = models.ForeignKey(User, on_delete = models.CASCADE)
     content = models.TextField()
+    media = models.FileField(upload_to = "comments-media/", blank = True, null = True)
     created_at = models.DateTimeField()
 
     def __str__(self):
@@ -34,3 +40,11 @@ class Like(models.Model):
         
     def __str__(self):
         return f'{self.comment} liked by {self.user}'
+    
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_picture = models.FileField(upload_to="profile-media/", blank=True, null=True)
+    
+    def __str__(self):
+        return self.user.username

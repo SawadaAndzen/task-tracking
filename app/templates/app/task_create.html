@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
-        <form method="POST" class="p-5 p-md-5 border rounded-3 bg-body-tertiary">
+        <form method="POST" enctype = "multipart/form-data" class="p-5 p-md-5 border rounded-3 bg-body-tertiary">
             <p>Owner:</p>
             <input class = "form-control mb-3" placeholder = "{{user.first_name}}" disabled></input>
             {% csrf_token %}
