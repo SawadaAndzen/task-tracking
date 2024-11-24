@@ -22,7 +22,7 @@
             {% if user.profile.profile_picture %}
               <img class= "rounded-5 me-1" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" width="32" height="32">
             {% else %}
-              <img class="rounded-5 me-1" src="{% static "best-profile-picture.jpg" %}" alt="avatar" width="32" height="32" />
+              <img class="rounded-5 me-1" src="{% static "image/best-profile-picture.jpg" %}" alt="avatar" width="32" height="32" />
             {% endif %}
             {% if user.is_superuser %}
               {{ user.first_name }} {{ user.last_name }} <i style = "color : Blue" class="ms-2 small bi bi-tools"></i>
