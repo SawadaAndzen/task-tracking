@@ -6,58 +6,134 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>{{task.name}}</h1>
-    <p>Desc: {{task.description}}</p>
-    <p>Status: {{task.get_status_display}}</p>
-    <p>Priority: {{task.get_priority_display}}</p>
-    <p>Deadline: {{task.deadline}}</p>
+    {% load custom_tags %}
 
-    <div class="row d-flex justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-0 border" style="background-color: #f0f2f5;">
-                <div class="card-body p-4">
-                    {% for comment in comments %}
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <p>{{comment.content}}</p>
-                                </div>
-                                <div class="d-flex flex-row align-items-center justify-content-start">
-                                    <img class="rounded-5" src="{% static "best-profile-picture.jpg" %}" alt="avatar" width="32" height="32" />
-                                    <p class="small mb-0 ms-2">{{comment.author.first_name}} {{comment.author.second_name}}</p>
-                                    <p class="small mb-0 ms-2 text-secondary">{{comment.created_at}}</p>
+    <div class = "row justify-content-start">
+        <div class = "col ms-2 mt-2">
+            <h1> {{task.name}}</h1>
+            <p> Description: {{task.description}}</p>
+            <p> Status: {{task.get_status_display}}</p>
 
-                                    {% if comment.author == current_user %}
-                                        <a class="bi bi-pencil ms-2 me-2" href="{% url "comment-update" comment.pk %}"></a>
-                                        <a class="bi bi-trash me-2" href="{% url "comment-delete" comment.pk %}"></a>
-                                    {% endif %}
-                                    
-                                    <div class="d-flex align-items-center ms-auto">
-                                        {% if user.is_authenticated %}
-                                            <a class="like-button" data-comment-id="{{ comment.id }}">
-                                                {% if user in comment.likes.all %}
-                                                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                                                {% else %}
-                                                    <i class="bi bi-hand-thumbs-up"></i>
-                                                {% endif %}
-                                            </a>
+            {% if task.status == "_in_progress" %}
+                <span class="badge text-bg-primary w-25 rounded-10"> </span>
+            {% elif task.status == "_done" %}
+                <span class="badge text-bg-success w-25 rounded-10"> </span>
+            {% elif task.status == "_expired" %}
+                <span class="badge text-bg-danger w-25 rounded-10"> </span>
+            {% endif %}
+
+            <p> Priority: {{task.get_priority_display}}</p>
+
+            {% if task.priority == "_low" %}
+                <span class="badge text-bg-primary w-25 rounded-10"> </span>
+            {% elif task.priority == "_mid" %}
+                <span class="badge text-bg-warning w-25 rounded-10"> </span>
+            {% elif task.priority == "_high" %}
+                <span class="badge text-bg-danger w-25 rounded-10"> </span>
+            {% endif %}
+
+            <p> Deadline: {{task.deadline}}</p>
+
+        </div>
+
+        <div class = "col-md-5">
+            <div class = "row">
+                {% if task.image %}
+                    <div class = "col-md-5">
+                        {% if task.image.url|endswith:".jpg" or task.image.url|endswith:".png"  or   task.image.url|endswith:".jpeg" or task.image.url|endswith:".jfif"%}
+                            <image src = "{{task.image.url}}" alt = "Image" class = "mt-2 rounded-5" style = "max-width: 250px;"></image>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if task.media %}
+                    <div class = "col-md-1">
+                        {% if task.media.url|endswith:".jpg" or task.media.url|endswith:".png" or task.media.url|endswith:".jpeg" or task.media.url|endswith:".jfif"%}
+                        <image src = "{{task.image.url}}" alt = "Image" class = "mt-2 rounded-5" style = "max-width: 300px;"></image>
+                        {% elif task.media.url|endswith:".mp4" %}
+                            <video alt = "Video" class = "mt-2 rounded-5 border" style = "max-width: 300px;" controls>
+                                <source src = "{{task.media.url}}" type = "video/mp4">
+                                Your browser doesn't support this video tag.
+                            </video>
+                        {% else %}
+                            <a class = "btn btn-primary" href = "{{task.media.url}}"> <i class="bi bi-download"></i> Download file</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                </div>
+        </div>
+
+        <div class = "mt-2 me-2 col-md-5 col-lg-4 ms-auto">
+            <h4> <i class="bi bi-chat-dots"></i> Comments ({{ comments.count }})</h4 >
+            <div class = "card shadow-0 border" style="background-color: #f0f2f5;">
+                <div class = "card-body p-3">
+                    <div class="overflow-auto" style="max-height: 400px;">
+                        {% for comment in comments %}
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <p>{{comment.content}}</p>
+                                        {% if comment.media %}
+                                            <a class="small" href="{{ comment.media.url }}">{{ comment.media.url|truncatechars:10 }}</a>
                                         {% endif %}
-                                        <p class="mb-0 ms-2"><span id="like-count-{{ comment.id }}">{{ comment.likes.count }}</span></p>
-                                    </div>                                    
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center justify-content-start">
+                                        {% if comment.author.profile.profile_picture %}
+                                            <img class= "rounded-5" src="{{ comment.author.profile.profile_picture.url }}" alt="Profile Picture" width="32" height="32">
+                                        {% else %}
+                                            <img class="rounded-5" src="{% static "best-profile-picture.jpg" %}" alt="avatar" width="32" height="32" />
+                                        {% endif %}
+
+                                        <p class="small mb-0 ms-2">{{comment.author.first_name}} {{comment.author.last_name}}</p>
+                                        
+                                        {% if comment.author == task.user %}
+                                            <i style = "color : Orange" class="ms-1 bi bi-person-gear"></i>
+                                        {% endif %}
+
+                                        {% if comment.author.is_superuser %}
+                                            <i style = "color : Blue" class="ms-1 small bi bi-tools"></i>
+                                        {% endif %}
+
+                                        <p class="small mb-0 ms-2 text-secondary">{{comment.created_at}}</p>
+
+                                        {% if comment.author == current_user or user.is_superuser %}
+                                            <a style = "color : DodgerBlue" class="bi bi-pencil ms-2 me-2" href="{% url "comment-update" comment.pk %}"></a>
+                                            <a style = "color : Tomato" class="bi bi-trash me-2" href="{% url "comment-delete" comment.pk %}"></a>
+                                        {% endif %}
+                                        
+                                        <div class="d-flex align-items-center ms-auto">
+                                            {% if user.is_authenticated %}
+                                                <a style = "color : MediumSeaGreen" class="like-button" data-comment-id="{{ comment.id }}">
+                                                    {% if user in comment.likes.all %}
+                                                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-hand-thumbs-up"></i>
+                                                    {% endif %}
+                                                </a>
+                                            {% endif %}
+                                            <p class="mb-0 ms-2"><span id="like-count-{{ comment.id }}">{{ comment.likes.count }}</span></p>
+                                        </div>                                    
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                    <form method="POST" class="d-flex align-items-center">
+                        {% endfor %}
+                    </div>
+                    <form method="POST" enctype = "multipart/form-data" class="d-flex align-items-center">
                         {% csrf_token %}
-                        <div class="flex-grow-1 me-2">
+                        <div class="flex-grow-1 mt-3">
                             {{ comments_form.as_p }}
                         </div>
-                        <div>
+                        <div class="justify-items-center ms-3">
+                            <label for="{{ comments_form.media.id_for_label }}" class="btn btn-primary">
+                                <i class="bi bi-paperclip"></i>
+                            </label>
+                            {{ comments_form.media }}
+                        </div>
+                        <div class = "justify-items-center">
                             {% if user.is_authenticated %}
-                                <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i></button>
+                                <button class="btn btn-primary ms-2" type="submit"><i class="bi bi-send"></i></button>
                             {% else %}
-                                <button class="btn btn-primary" type="submit" disabled><i class="bi bi-send"></i></button>
+                                <button class="btn btn-primary ms-2" type="submit" disabled><i class="bi bi-send"></i></button>
                             {% endif %}
                         </div>
                     </form>
@@ -66,16 +142,15 @@
         </div>
     </div>
 
-    <script>
+    <script> //script used from ChatGPT-4o
         document.querySelectorAll('.like-button').forEach(button => {
             button.addEventListener('click', async function () {
                 const commentId = this.getAttribute('data-comment-id');
                 
-                // Send an AJAX request to the like endpoint
                 const response = await fetch(`/comments/${commentId}/like/`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}', // Make sure CSRF token is available
+                        'X-CSRFToken': '{{ csrf_token }}',
                     },
                 });
                 
@@ -84,7 +159,6 @@
                     const liked = data.liked;
                     const totalLikes = data.total_likes;
     
-                    // Toggle the icon (simplified example)
                     const icon = this.querySelector('i');
                     if (liked) {
                         icon.classList.replace('bi-hand-thumbs-up', 'bi-hand-thumbs-up-fill');
@@ -92,7 +166,6 @@
                         icon.classList.replace('bi-hand-thumbs-up-fill', 'bi-hand-thumbs-up');
                     }
     
-                    // Update the like count in the DOM
                     const likeCountElement = document.getElementById(`like-count-${commentId}`);
                     if (likeCountElement) {
                         likeCountElement.textContent = totalLikes;
